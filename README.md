@@ -4,6 +4,9 @@
 
 This project applies machine learning algorithms to predict whether a patient has heart disease or not based on their medical attributes. The goal is to build a robust classification model that maximizes Recall (sensitivity) to ensure that no patient with actual heart disease is misdiagnosed as healthy.
 
+
+Deployment link ->> https://heart-disease-project-mu.vercel.app/
+
 📊 Data Description
 
 The dataset contains medical records of patients. It includes the following features (attributes):
