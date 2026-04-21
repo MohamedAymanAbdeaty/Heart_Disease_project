@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
 from functools import lru_cache
 from typing import Dict
+
+# Ensure the project root is on sys.path so ai_pipeline can be imported.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field

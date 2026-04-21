@@ -15,12 +15,17 @@
     }
   ],
   "functions": {
-    "api/*.py": {
-      "maxDuration": 30
-    },
     "api/index.py": {
       "maxDuration": 30,
-      "includeFiles": "index.html"
+      "includeFiles": "{ai_pipeline.py,heart-disease.csv,index.html}"
+    },
+    "api/predict.py": {
+      "maxDuration": 30,
+      "includeFiles": "{ai_pipeline.py,heart-disease.csv}"
+    },
+    "api/health.py": {
+      "maxDuration": 30,
+      "includeFiles": "{ai_pipeline.py,heart-disease.csv}"
     }
   }
 }
