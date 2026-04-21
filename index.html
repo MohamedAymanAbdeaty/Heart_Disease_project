@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CardioCare AI</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f0fdfa;
+      color: #111827;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+    h1 { color: #0f766e; margin-top: 0; }
+    label { display: block; margin-top: 1rem; font-weight: 600; }
+    input, select {
+      width: 100%; padding: 0.5rem; margin-top: 0.5rem;
+      border: 1px solid #ccc; border-radius: 0.5rem;
+    }
+    button {
+      width: 100%; margin-top: 2rem; padding: 1rem;
+      background: #0f766e; color: white; font-weight: bold;
+      border: none; border-radius: 0.5rem; cursor: pointer;
+    }
+    button:hover { background: #115e59; }
+    #result { margin-top: 1.5rem; padding: 1rem; border-radius: 0.5rem; display: none; }
+    .success { background: #dcfce7; color: #064e3b; border: 1px solid #86efac; }
+    .error { background: #fee2e2; color: #7f1d1d; border: 1px solid #fca5a5; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🫀 CardioCare AI</h1>
+    <p>Enter patient details to estimate heart disease risk.</p>
+    <form id="predict-form">
+      <label>Age <input type="number" id="age" value="45" min="18" max="100"/></label>
+      
+      <label>Sex
+        <select id="sex">
+          <option value="1">Male</option>
+          <option value="0">Female</option>
+        </select>
+      </label>
+
+      <label>Chest Pain Type
+        <select id="cp">
+          <option value="0">Typical Angina</option>
+          <option value="1">Atypical Angina</option>
+          <option value="2" selected>Non-anginal Pain</option>
+          <option value="3">Asymptomatic</option>
+        </select>
+      </label>
+
+      <label>Resting Blood Pressure (mm Hg) <input type="number" id="trestbps" value="120" min="80" max="250"/></label>
+      
+      <label>Cholesterol (mg/dl) <input type="number" id="chol" value="200" min="100" max="700"/></label>
+
+      <label>Fasting Blood Sugar > 120 mg/dl
+        <select id="fbs">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </label>
+
+      <label>Resting ECG
+        <select id="restecg">
+          <option value="0">Normal</option>
+          <option value="1">ST-T Wave Abnormality</option>
+          <option value="2">Left Ventricular Hypertrophy</option>
+        </select>
+      </label>
+
+      <label>Max Heart Rate Achieved <input type="number" id="thalach" value="150" min="60" max="220"/></label>
+
+      <label>Exercise-Induced Angina
+        <select id="exang">
+          <option value="0" selected>No</option>
+          <option value="1">Yes</option>
+        </select>
+      </label>
+
+      <label>Oldpeak (ST depression) <input type="number" id="oldpeak" value="1.0" step="0.1" min="0" max="10"/></label>
+
+      <label>ST Slope
+        <select id="slope">
+          <option value="0">Up-sloping</option>
+          <option value="1" selected>Flat</option>
+          <option value="2">Down-sloping</option>
+        </select>
+      </label>
+
+      <label>Number of Major Vessels (ca)
+        <select id="ca"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
+      </label>
+
+      <label>Thalassemia (thal)
+        <select id="thal"><option value="0">0</option><option value="1">Normal (1)</option><option value="2" selected>Fixed Defect (2)</option><option value="3">Reversible Defect (3)</option></select>
+      </label>
+
+      <button type="submit" id="submit-btn">Predict Heart Disease Risk</button>
+    </form>
+    
+    <div id="result"></div>
+  </div>
+
+  <script>
+    document.getElementById('predict-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      const res = document.getElementById('result');
+      
+      btn.textContent = "Analyzing...";
+      btn.disabled = true;
+      res.style.display = 'none';
+
+      const payload = {
+        age: parseFloat(document.getElementById('age').value),
+        sex: parseFloat(document.getElementById('sex').value),
+        cp: parseFloat(document.getElementById('cp').value),
+        trestbps: parseFloat(document.getElementById('trestbps').value),
+        chol: parseFloat(document.getElementById('chol').value),
+        fbs: parseFloat(document.getElementById('fbs').value),
+        restecg: parseFloat(document.getElementById('restecg').value),
+        thalach: parseFloat(document.getElementById('thalach').value),
+        exang: parseFloat(document.getElementById('exang').value),
+        oldpeak: parseFloat(document.getElementById('oldpeak').value),
+        slope: parseFloat(document.getElementById('slope').value),
+        ca: parseFloat(document.getElementById('ca').value),
+        thal: parseFloat(document.getElementById('thal').value)
+      };
+
+      try {
+        const response = await fetch('/api/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error("API Server Error");
+        const data = await response.json();
+        
+        res.style.display = 'block';
+        if (data.prediction === 1) {
+          res.className = 'error';
+          res.innerHTML = `<strong>High Risk Detected</strong><br/>Estimated risk score: ${(data.probability * 100).toFixed(1)}%<br/><small>Please consult a healthcare provider.</small>`;
+        } else {
+          res.className = 'success';
+          res.innerHTML = `<strong>Low Risk Indicated</strong><br/>Estimated risk score: ${(data.probability * 100).toFixed(1)}%`;
+        }
+      } catch (err) {
+        res.style.display = 'block';
+        res.className = 'error';
+        res.innerHTML = `<strong>Error</strong><br/>Could not reach prediction API.`;
+      } finally {
+        btn.textContent = "Predict Heart Disease Risk";
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

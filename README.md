@@ -126,3 +126,60 @@ Classification Report (Precision, Recall, F1-Score)
 
 Receiver Operating Characteristic (ROC) Curve and Area Under the Curve (AUC)
 
+## Deploy on Vercel (Working Setup)
+
+This repository now includes a Vercel Python API entrypoint at `api/index.py`.
+
+### Important
+
+- `npx plugins add vercel/vercel-plugin` is not required for Vercel deployment.
+- That command is for a different plugin workflow and does not deploy this project.
+- Also, `npx` only works if Node.js is installed locally.
+
+### Correct deploy steps
+
+1. Install Node.js (LTS) if not installed.
+2. Login to Vercel:
+
+	 ```bash
+	 npx vercel login
+	 ```
+
+3. Deploy from project root:
+
+	 ```bash
+	 npx vercel --prod
+	 ```
+
+### Endpoints after deploy
+
+- `/` -> API status message
+- `/health` -> health/model check
+- `/predict` -> POST prediction endpoint
+
+### Example request
+
+```bash
+curl -X POST "https://<your-project>.vercel.app/predict" \
+	-H "Content-Type: application/json" \
+	-d '{
+		"age": 52,
+		"sex": 1,
+		"cp": 2,
+		"trestbps": 130,
+		"chol": 240,
+		"fbs": 0,
+		"restecg": 1,
+		"thalach": 150,
+		"exang": 0,
+		"oldpeak": 1.2,
+		"slope": 1,
+		"ca": 0,
+		"thal": 2
+	}'
+```
+
+## Note about Streamlit on Vercel
+
+
+
