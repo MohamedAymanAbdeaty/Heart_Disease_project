@@ -2,13 +2,25 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.py"
+      "source": "/",
+      "destination": "/api"
+    },
+    {
+      "source": "/predict",
+      "destination": "/api/predict"
+    },
+    {
+      "source": "/health",
+      "destination": "/api/health"
     }
   ],
   "functions": {
-    "api/index.py": {
+    "api/*.py": {
       "maxDuration": 30
+    },
+    "api/index.py": {
+      "maxDuration": 30,
+      "includeFiles": "index.html"
     }
   }
 }

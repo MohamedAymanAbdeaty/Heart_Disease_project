@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Dict
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from ai_pipeline import DATASET_PATH, ModelBundle, build_optimized_model, predict_disease
@@ -16,6 +18,9 @@ app = FastAPI(
     version="1.0.0",
     description="Vercel-ready API for heart disease risk inference.",
 )
+
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
 
 
 class PredictRequest(BaseModel):
@@ -43,8 +48,21 @@ def get_bundle() -> ModelBundle:
 
 
 @app.get("/")
-def root() -> Dict[str, str]:
-    """Basic landing endpoint to verify deployment is alive."""
+def root() -> HTMLResponse:
+    """Serve the static frontend HTML from the Python function."""
+    html_path = ROOT_DIR / "index.html"
+
+    try:
+        html = html_path.read_text(encoding="utf-8")
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    return HTMLResponse(content=html)
+
+
+@app.get("/status")
+def status() -> Dict[str, str]:
+    """Machine-readable status endpoint for quick API checks."""
     return {
         "status": "ok",
         "message": "Heart Disease Predictor API is running.",
