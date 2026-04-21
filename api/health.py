@@ -11,6 +11,7 @@ from typing import Dict
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastapi import FastAPI, HTTPException
+from mangum import Mangum
 
 from ai_pipeline import DATASET_PATH, ModelBundle, build_optimized_model
 
@@ -36,3 +37,7 @@ def health() -> Dict[str, str]:
         "status": "healthy",
         "selected_model": bundle.selected_model_name,
     }
+
+
+# Vercel ASGI entry point
+handler = Mangum(app, lifespan="off")
